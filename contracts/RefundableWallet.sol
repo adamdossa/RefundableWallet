@@ -34,6 +34,8 @@ contract RefundableWallet is Ownable {
   constructor(address _token, uint256 _dispersalLength) public payable {
     //Token should have finished minting
     token = ERC20(_token);
+    //Assumes 18 decimals for WAD multiplication / division
+    /* assert(token.decimals() == 18); */
     initialTotalSupply = token.totalSupply();
     dispersalLength = _dispersalLength;
     deposit = address(this).balance;
@@ -61,21 +63,17 @@ contract RefundableWallet is Ownable {
   }
 
   function calculateRefund(uint256 _amount) public view returns(uint256) {
-    uint256 numerator = _amount.mul(getRefundableBalance());
+    uint256 numerator = wmul(_amount,getRefundableBalance());
     uint256 denominator = token.totalSupply().sub(token.balanceOf(address(this)));
-    emit Log(numerator, denominator);
-    emit Log(getRefundableBalance(), getRefundableBalance());
-    return wdiv(numerator, denominator).div(WAD);
+    return wdiv(numerator, denominator);
   }
-
-  event Log(uint numerator, uint denominator);
 
   function getRefundableBalance() public view returns(uint256) {
     return address(this).balance.sub(getDispersableEther().sub(dispersal));
   }
 
   function getDispersableEther() public view returns(uint256) {
-    return wmul(deposit, wdiv(getBlockNumber().sub(startingBlock), dispersalLength));
+    return deposit.mul(getBlockNumber().sub(startingBlock)).div(dispersalLength);
   }
 
   function wmul(uint256 _x, uint256 _y) internal pure returns(uint256) {

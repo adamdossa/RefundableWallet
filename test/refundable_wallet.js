@@ -77,14 +77,14 @@ contract('RefundableWallet', function (accounts) {
   });
 
   it("4. time 500 - rebuy", async () => {
-    //buy 200 tokens at a cost of 1 ETH
+    //buy 20 tokens at a cost of 1 ETH
     let initialWalletBalance = await token.balanceOf(wallet.address);
     let initialBuyerBalance = await token.balanceOf(accounts[3]);
     await wallet.buy({from: accounts[3], value: 1*10**18});
     let finalWalletBalance = await token.balanceOf(wallet.address);
     let finalBuyerBalance = await token.balanceOf(accounts[3]);
-    assert.equal(initialWalletBalance.sub(finalWalletBalance).toNumber(), 200*10**18);
-    assert.equal(finalBuyerBalance.sub(initialBuyerBalance).toNumber(), 200*10**18);
+    assert.equal(initialWalletBalance.sub(finalWalletBalance).toNumber(), 20*10**18);
+    assert.equal(finalBuyerBalance.sub(initialBuyerBalance).toNumber(), 20*10**18);
   });
 
 
